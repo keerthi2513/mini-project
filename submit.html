@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <div class="page-eyebrow">New Report</div>
+    <h1>Submit a Complaint</h1>
+    <p>Fill in the details below to log a new pollution incident.</p>
+</div>
+
+<div class="form-wrap">
+    <div class="form-card">
+        <form method="POST">
+            <div class="form-row">
+                <label>Your Name</label>
+                <input type="text" name="name" placeholder="Full name">
+            </div>
+
+            <div class="form-row">
+                <label>Area / Location</label>
+                <input type="text" name="area" placeholder="e.g. Banjara Hills, Madhapur">
+            </div>
+
+            <div class="form-row">
+                <label>Pollution Type</label>
+                <select name="type">
+                    <option value="" disabled selected>Select a category...</option>
+                    <option>Vehicle Smoke</option>
+                    <option>Garbage Burning</option>
+                    <option>Construction Dust</option>
+                    <option>Factory Emissions</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>Description</label>
+                <textarea name="description" placeholder="Describe the pollution in detail (min 10 characters)..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <label>Date of Incident</label>
+                <input type="date" name="date">
+            </div>
+
+            <button type="submit" class="btn" style="width:100%; margin-top:8px; padding:12px;">Submit Report</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

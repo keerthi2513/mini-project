@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="page-header">
+    <div class="page-eyebrow">Time Series</div>
+    <h1>Trend Analysis</h1>
+    <p>Daily complaint volume over time — spot spikes and recurring patterns.</p>
+</div>
+
+<!-- Line chart -->
+<div class="chart-card" style="margin-bottom: 20px;">
+    <div class="chart-title">Daily Report Volume</div>
+    <canvas id="trendChart" height="100"></canvas>
+</div>
+
+<!-- Daily breakdown -->
+<div class="panel">
+    <div class="panel-header">
+        <span class="panel-title">Daily Breakdown</span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);">{{ data|length }} days</span>
+    </div>
+    <div class="panel-body">
+        {% set ns = namespace(max_val=1) %}
+        {% for row in data %}{% if row[1] > ns.max_val %}{% set ns.max_val = row[1] %}{% endif %}{% endfor %}
+
+        {% for row in data %}
+        <div class="trend-row">
+            <span class="trend-date">{{ row[0] }}</span>
+            <div class="trend-bar-wrap">
+                <div class="trend-bar" style="width: {{ (row[1] / ns.max_val * 100)|int }}%"></div>
+            </div>
+            <span class="trend-count">{{ row[1] }} reports</span>
+        </div>
+        {% endfor %}
+
+        {% if not data %}
+        <p style="color:var(--muted); font-size:13px; padding:20px 0; text-align:center;">No trend data available yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+Chart.defaults.color = '#6b8fa8';
+Chart.defaults.borderColor = '#c5ddf0';
+
+const trendLabels = [{% for row in data %}"{{ row[0] }}",{% endfor %}];
+const trendValues = [{% for row in data %}{{ row[1] }},{% endfor %}];
+
+new Chart(document.getElementById("trendChart"), {
+    type: "line",
+    data: {
+        labels: trendLabels,
+        datasets: [{
+            data: trendValues,
+            borderColor: "#1d78b8",
+            backgroundColor: "rgba(29,120,184,0.08)",
+            pointBackgroundColor: "#1d78b8",
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#e8f4fd' }, ticks: { font: { family: 'JetBrains Mono', size: 10 } } },
+            x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 } } }
+        }
+    }
+});
+</script>
+{% endblock %}

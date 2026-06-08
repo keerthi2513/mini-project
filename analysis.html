@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="page-header">
+    <div class="page-eyebrow">Live Data</div>
+    <h1>Pollution Hotspots</h1>
+    <p>Area-wise complaint analysis with risk classification.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Total Complaints</div>
+        <div class="stat-value counter" data-target="{{ total }}">0</div>
+        <div class="stat-sub">↑ across all areas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Top Area</div>
+        <div class="stat-text">{{ top_area[0] }}</div>
+        <div class="stat-sub">{{ top_area[1] }} complaints logged</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Top Pollution Type</div>
+        <div class="stat-text">{{ top_type[0] }}</div>
+        <div class="stat-sub">Most frequently reported</div>
+    </div>
+</div>
+
+<!-- Filter -->
+<form method="GET" action="/analysis" class="filter-bar">
+    <input type="text" name="area" placeholder="Search area..." value="{{ request.args.get('area', '') }}">
+    <select name="type">
+        <option value="">All Types</option>
+        <option {% if request.args.get('type') == 'Vehicle Smoke'      %}selected{% endif %}>Vehicle Smoke</option>
+        <option {% if request.args.get('type') == 'Garbage Burning'    %}selected{% endif %}>Garbage Burning</option>
+        <option {% if request.args.get('type') == 'Construction Dust'  %}selected{% endif %}>Construction Dust</option>
+        <option {% if request.args.get('type') == 'Factory Emissions'  %}selected{% endif %}>Factory Emissions</option>
+    </select>
+    <button type="submit" class="btn">Filter</button>
+    {% if request.args.get('area') or request.args.get('type') %}
+    <a href="/analysis" class="btn-ghost">Clear</a>
+    {% endif %}
+</form>
+
+{% if request.args.get('area') or request.args.get('type') %}
+<div class="filter-chip">
+    query: area=<em>{{ request.args.get('area') or '*' }}</em> type=<em>{{ request.args.get('type') or '*' }}</em>
+</div>
+{% endif %}
+
+<!-- Top 3 -->
+{% if data %}
+<div class="top3-row">
+    {% for row in data[:3] %}
+    <div class="top3-card">
+        <div class="top3-num">#{{ loop.index }}</div>
+        <div>
+            <div class="top3-name">{{ row[0] }}</div>
+            <div class="top3-cnt">{{ row[1] }} complaints</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- All areas -->
+<div class="panel">
+    <div class="panel-header">
+        <span class="panel-title">All Areas</span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);">{{ data|length }} result{% if data|length != 1 %}s{% endif %}</span>
+    </div>
+    <div class="panel-body">
+        {% for row in data %}
+        <div class="hotspot-item" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+            <span class="hotspot-idx">{{ '%02d'|format(loop.index) }}</span>
+            <div class="hotspot-info">
+                <div class="hotspot-name">{{ row[0] }}</div>
+                <div class="bar-track">
+                    <div class="bar-fill {{ row[2]|lower }}" style="width: min({{ row[1]|int * 10 }}%, 100%)"></div>
+                </div>
+            </div>
+            <div class="hotspot-right">
+                <span class="hotspot-count">{{ row[1] }}</span>
+                <span class="badge {{ row[2]|lower }}">{{ row[2] }}</span>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not data %}
+        <p style="color:var(--muted); font-size:13px; padding:20px 0; text-align:center;">No data found for this filter.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="charts-row">
+    <div class="chart-card">
+        <div class="chart-title">Type Distribution</div>
+        <canvas id="typeChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">Area Complaints</div>
+        <canvas id="areaChart"></canvas>
+    </div>
+</div>
+
+<script>
+Chart.defaults.color = '#6b8fa8';
+Chart.defaults.borderColor = '#c5ddf0';
+
+const typeLabels = [{% for row in type_data %}"{{ row[0] }}",{% endfor %}];
+const typeValues = [{% for row in type_data %}{{ row[1] }},{% endfor %}];
+
+new Chart(document.getElementById("typeChart"), {
+    type: "doughnut",
+    data: {
+        labels: typeLabels,
+        datasets: [{
+            data: typeValues,
+            backgroundColor: ["#58a6ff","#f85149","#e3b341","#3fb950"],
+            borderColor: "#ffffff",
+            borderWidth: 3,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '65%',
+        plugins: {
+            legend: {
+                position: "bottom",
+                labels: { padding: 14, font: { size: 11, family: 'JetBrains Mono' }, color: '#7d8590' }
+            }
+        },
+        animation: { animateScale: true, duration: 900 }
+    }
+});
+
+const areaLabels = [{% for row in area_data %}"{{ row[0] }}",{% endfor %}];
+const areaValues = [{% for row in area_data %}{{ row[1] }},{% endfor %}];
+
+new Chart(document.getElementById("areaChart"), {
+    type: "bar",
+    data: {
+        labels: areaLabels,
+        datasets: [{
+            data: areaValues,
+            backgroundColor: "#1d78b8",
+            hoverBackgroundColor: "#5bb8f5",
+            borderRadius: 4,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#e8f4fd' }, ticks: { font: { family: 'JetBrains Mono', size: 10 } } },
+            x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 } } }
+        }
+    }
+});
+</script>
+
+<script>
+document.querySelectorAll('.counter').forEach(el => {
+    const target = +el.dataset.target;
+    let n = 0;
+    const step = Math.max(1, Math.floor(target / 40));
+    const timer = setInterval(() => {
+        n = Math.min(n + step, target);
+        el.textContent = n;
+        if (n >= target) clearInterval(timer);
+    }, 28);
+});
+</script>
+{% endblock %}

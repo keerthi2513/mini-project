@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirWatch — Pollution Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <div class="brand-icon">A</div>
+        <span class="brand-name">AirWatch</span>
+        <span class="brand-badge">v1.0</span>
+    </a>
+    <div class="nav-links">
+        <a href="/"             {% if request.path == '/'             %}class="active"{% endif %}>Home</a>
+        <a href="/submit"       {% if request.path == '/submit'       %}class="active"{% endif %}>Submit</a>
+        <a href="/analysis"     {% if request.path == '/analysis'     %}class="active"{% endif %}>Hotspots</a>
+        <a href="/type_analysis"{% if request.path == '/type_analysis'%}class="active"{% endif %}>Types</a>
+        <a href="/trend"        {% if request.path == '/trend'        %}class="active"{% endif %}>Trend</a>
+    </div>
+</nav>
+
+<div class="page">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

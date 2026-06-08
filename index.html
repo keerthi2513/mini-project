@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="home-intro">
+    <div class="terminal-line">
+        <span class="prompt">$</span> airwatch --status live --region hyderabad
+    </div>
+    <h1 class="home-h1">Monitor. Analyze.<br><span>Act on Pollution.</span></h1>
+    <p class="home-sub">Real-time tracking of air pollution complaints across your region. Submit incidents, identify hotspots, and study trends — all in one place.</p>
+</div>
+
+<div class="home-grid">
+    <a href="/submit" class="home-card">
+        <span class="home-card-tag">POST /submit</span>
+        <h3>Submit Complaint</h3>
+        <p>Report a pollution incident with location, type, and description.</p>
+        <span class="home-card-arrow">→</span>
+    </a>
+    <a href="/analysis" class="home-card">
+        <span class="home-card-tag">GET /hotspots</span>
+        <h3>Hotspot Map</h3>
+        <p>See which areas have the highest complaint volumes and risk levels.</p>
+        <span class="home-card-arrow">→</span>
+    </a>
+    <a href="/type_analysis" class="home-card">
+        <span class="home-card-tag">GET /types</span>
+        <h3>Pollution Types</h3>
+        <p>Breakdown of pollution categories — vehicles, factories, burning, dust.</p>
+        <span class="home-card-arrow">→</span>
+    </a>
+    <a href="/trend" class="home-card">
+        <span class="home-card-tag">GET /trend</span>
+        <h3>Trend Analysis</h3>
+        <p>Track daily complaint volume over time to spot patterns and spikes.</p>
+        <span class="home-card-arrow">→</span>
+    </a>
+</div>
+{% endblock %}

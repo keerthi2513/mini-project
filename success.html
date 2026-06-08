@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="4;url=/">
+    <title>Complaint Submitted</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background: var(--bg);">
+<div class="page success-wrap">
+    <div class="success-card">
+        <div class="success-icon">✅</div>
+        <h2>Complaint Submitted</h2>
+        <p>{{ suggestion }}</p>
+
+        <a href="/" class="btn" style="width:100%; text-align:center; display:block;">Back to Home</a>
+
+        <p class="text-muted" style="margin-top:16px; font-size:12px;">Redirecting automatically in 4 seconds...</p>
+    </div>
+</div>
+</body>
+</html>

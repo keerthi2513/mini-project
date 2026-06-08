@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <div class="page-eyebrow">Category Analysis</div>
+    <h1>Pollution Types</h1>
+    <p>Ranked breakdown of pollution sources by complaint volume.</p>
+</div>
+
+{% set max_count = data[0][1] if data else 1 %}
+
+<div class="panel">
+    <div class="panel-header">
+        <span class="panel-title">All Categories</span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);">{{ data|length }} types</span>
+    </div>
+    <div class="panel-body">
+        {% for type, count in data %}
+        <div class="type-row" style="animation-delay: {{ loop.index0 * 0.06 }}s">
+            <div class="type-top">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); min-width:20px;">#{{ loop.index }}</span>
+                    <span class="type-name">{{ type }}</span>
+                </div>
+                <span class="type-count">{{ count }}</span>
+            </div>
+            <div class="bar-track" style="margin-left:30px;">
+                <div class="bar-fill medium" style="width: {{ (count / max_count * 100)|int }}%; background: var(--accent);"></div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not data %}
+        <p style="color:var(--muted); font-size:13px; padding:20px 0; text-align:center;">No data available yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
